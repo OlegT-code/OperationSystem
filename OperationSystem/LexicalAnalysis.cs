@@ -400,9 +400,13 @@ namespace OperationSystem
                 line = line.Remove(line.Length - 1);
                 num = Convert.ToInt32(line, 16);
             }
-            else if (line.All(s => s == '1' || s == '0'))
+            /*else if (line.All(s => s == '1' || s == '0'))
             {
                 num = Convert.ToInt32(line, 2);
+            }*/
+            else if (line.All(s => Char.IsNumber(s)))
+            {
+                num = Convert.ToInt32(line);
             }
             else
             {
