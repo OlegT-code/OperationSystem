@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeGenerator.cs" />
     <Compile Include="Compiler.cs" />
     <Compile Include="ErrorChecker.cs" />
     <Compile Include="Form1.cs">
@@ -55,6 +56,8 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="ObjectCode.cs" />
+    <Compile Include="ObjectCodeGenerator.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="LexicalAnalysis.cs" />
     <Compile Include="Program.cs" />

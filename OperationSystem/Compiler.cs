@@ -10,7 +10,7 @@ namespace OperationSystem
     public static class Compiler
     {
 
-        public static void Compile(RichTextBox tbSourceCode, RichTextBox tbResult, DataGridView dgvTokens)
+        public static void Compile(RichTextBox tbSourceCode, RichTextBox tbResult, DataGridView dgvTokens, DataGridView dgvObjectCode)
         {
             ErrorChecker.cleanErrorChecker();
             SourceCode.SaveCurrentSourceCode(tbSourceCode);
@@ -42,6 +42,8 @@ namespace OperationSystem
             }
 
             LexicalAnalysis.ShowTokensInDataGridView(dgvTokens);
+            
+            CodeGenerator.ShowObjectCodeInDataGridView(dgvObjectCode);
 
             LexicalAnalysis.SaveCompilerCodeToFile();
         }

@@ -27,6 +27,7 @@ namespace OperationSystem
         {
             SourceCode.UploadSourceCodeFromFileToList(SourceCode.LoadLastFileCode());
             SourceCode.ShowSourceCode(tbSourceCode);
+
         }
 
         private void OpenMenuItem_Click(object sender, EventArgs e)
@@ -53,7 +54,7 @@ namespace OperationSystem
 
         public void CompileCode()
         {
-            Compiler.Compile(tbSourceCode, tbResult, dgvTokens);
+            Compiler.Compile(tbSourceCode, tbResult, dgvTokens, dgvObjectCode);
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -75,6 +76,11 @@ namespace OperationSystem
 
             string path = saveFileDialog1.FileName;
             System.IO.File.WriteAllText(path, tbSourceCode.Text);
+        }
+
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
         }
     }
 }

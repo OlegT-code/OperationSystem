@@ -2,21 +2,20 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace OperationSystem
 {
     public static class LexicalAnalysis
     {
-        static List<List<string>> codeElements = new List<List<string>>(3);
+        public static List<List<string>> codeElements = new List<List<string>>(3);
         static string line, pattern = @"\s+", patternForKoma = @"\s*,\s*";
 
         static string[] dataRegisters8bit = new string[] { "AL", "AH", "BL", "BH", "CL", "CH", "DL", "DH" };
         static string[] dataRegisters16bit = new string[] { "AX", "BX", "CX", "DX" };
         static string[] segmentRegisters = { "DS", "SS", "ES" };
+        static string[] keywords = { "db", "dw", "add", "sub", "pop" };
 
         static List<Token> tokens = new List<Token>();
 
@@ -113,7 +112,7 @@ namespace OperationSystem
             command[1] = command[1].ToUpper();
             command[2] = command[2].ToUpper();
 
-            if (IsVariable(command[0]) && !(dwVariables.Any(s => s == command[0]) || dbVariables.Any(s => s == command[0])))
+            if (IsVariable(command[0]) && !(dwVariables.Any(s => s == command[0]) || dbVariables.Any(s => s == command[0])) && !keywords.Contains(command[0].ToLower()))
             {
                 tokenVariable = new Token(index + 1, 12, command[0]);
             } else

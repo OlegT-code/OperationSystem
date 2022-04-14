@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.FileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -43,8 +44,14 @@
             this.NumStr = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colNumToken = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colSpecToken = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgvObjectCode = new System.Windows.Forms.DataGridView();
+            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.stringProgram = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvTokens)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvObjectCode)).BeginInit();
             this.SuspendLayout();
             // 
             // openFileDialog1
@@ -59,9 +66,10 @@
             this.FileMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(982, 28);
+            this.menuStrip1.Size = new System.Drawing.Size(1382, 28);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
+            this.menuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked);
             // 
             // FileMenuItem
             // 
@@ -99,7 +107,7 @@
             this.tbSourceCode.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.tbSourceCode.Location = new System.Drawing.Point(12, 46);
             this.tbSourceCode.Name = "tbSourceCode";
-            this.tbSourceCode.Size = new System.Drawing.Size(457, 495);
+            this.tbSourceCode.Size = new System.Drawing.Size(260, 504);
             this.tbSourceCode.TabIndex = 1;
             this.tbSourceCode.Text = "";
             // 
@@ -108,7 +116,7 @@
             this.btnCompile.BackColor = System.Drawing.SystemColors.Window;
             this.btnCompile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCompile.Image = ((System.Drawing.Image)(resources.GetObject("btnCompile.Image")));
-            this.btnCompile.Location = new System.Drawing.Point(475, 212);
+            this.btnCompile.Location = new System.Drawing.Point(278, 261);
             this.btnCompile.Name = "btnCompile";
             this.btnCompile.Size = new System.Drawing.Size(50, 50);
             this.btnCompile.TabIndex = 2;
@@ -118,7 +126,8 @@
             // tbResult
             // 
             this.tbResult.BackColor = System.Drawing.SystemColors.Window;
-            this.tbResult.Location = new System.Drawing.Point(531, 456);
+            this.tbResult.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.tbResult.Location = new System.Drawing.Point(589, 456);
             this.tbResult.Name = "tbResult";
             this.tbResult.ReadOnly = true;
             this.tbResult.Size = new System.Drawing.Size(439, 85);
@@ -133,11 +142,11 @@
             this.NumStr,
             this.colNumToken,
             this.colSpecToken});
-            this.dgvTokens.Location = new System.Drawing.Point(531, 46);
+            this.dgvTokens.Location = new System.Drawing.Point(334, 46);
             this.dgvTokens.Name = "dgvTokens";
             this.dgvTokens.RowHeadersWidth = 51;
             this.dgvTokens.RowTemplate.Height = 24;
-            this.dgvTokens.Size = new System.Drawing.Size(439, 404);
+            this.dgvTokens.Size = new System.Drawing.Size(474, 404);
             this.dgvTokens.TabIndex = 4;
             // 
             // NumStr
@@ -159,6 +168,59 @@
             this.colSpecToken.HeaderText = "Спецификатор лексемы";
             this.colSpecToken.MinimumWidth = 6;
             this.colSpecToken.Name = "colSpecToken";
+            this.colSpecToken.Width = 125;
+            // 
+            // dgvObjectCode
+            // 
+            this.dgvObjectCode.BackgroundColor = System.Drawing.SystemColors.Window;
+            this.dgvObjectCode.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvObjectCode.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dataGridViewTextBoxColumn1,
+            this.dataGridViewTextBoxColumn2,
+            this.dataGridViewTextBoxColumn3,
+            this.stringProgram});
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.TopCenter;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgvObjectCode.DefaultCellStyle = dataGridViewCellStyle1;
+            this.dgvObjectCode.Location = new System.Drawing.Point(814, 46);
+            this.dgvObjectCode.Name = "dgvObjectCode";
+            this.dgvObjectCode.RowHeadersWidth = 51;
+            this.dgvObjectCode.RowTemplate.Height = 24;
+            this.dgvObjectCode.Size = new System.Drawing.Size(556, 404);
+            this.dgvObjectCode.TabIndex = 5;
+            // 
+            // dataGridViewTextBoxColumn1
+            // 
+            this.dataGridViewTextBoxColumn1.HeaderText = "№ строки";
+            this.dataGridViewTextBoxColumn1.MinimumWidth = 6;
+            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            this.dataGridViewTextBoxColumn1.Width = 75;
+            // 
+            // dataGridViewTextBoxColumn2
+            // 
+            this.dataGridViewTextBoxColumn2.HeaderText = "Адрес";
+            this.dataGridViewTextBoxColumn2.MinimumWidth = 6;
+            this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+            this.dataGridViewTextBoxColumn2.Width = 60;
+            // 
+            // dataGridViewTextBoxColumn3
+            // 
+            this.dataGridViewTextBoxColumn3.HeaderText = "Код команды";
+            this.dataGridViewTextBoxColumn3.MinimumWidth = 6;
+            this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
+            this.dataGridViewTextBoxColumn3.Width = 105;
+            // 
+            // stringProgram
+            // 
+            this.stringProgram.HeaderText = "Строка";
+            this.stringProgram.MinimumWidth = 6;
+            this.stringProgram.Name = "stringProgram";
+            this.stringProgram.Width = 105;
             // 
             // Form1
             // 
@@ -166,7 +228,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(982, 553);
+            this.ClientSize = new System.Drawing.Size(1382, 553);
+            this.Controls.Add(this.dgvObjectCode);
             this.Controls.Add(this.dgvTokens);
             this.Controls.Add(this.tbResult);
             this.Controls.Add(this.btnCompile);
@@ -180,6 +243,7 @@
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvTokens)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvObjectCode)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -201,6 +265,11 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn NumStr;
         private System.Windows.Forms.DataGridViewTextBoxColumn colNumToken;
         private System.Windows.Forms.DataGridViewTextBoxColumn colSpecToken;
+        private System.Windows.Forms.DataGridView dgvObjectCode;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
+        private System.Windows.Forms.DataGridViewTextBoxColumn stringProgram;
     }
 }
 
