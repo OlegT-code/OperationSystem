@@ -371,7 +371,7 @@ namespace OperationSystem
             return true;
         }
 
-        static bool IsVariable(string line)
+        public static bool IsVariable(string line)
         {
             for (int i = 0; i < line.Length; i++)
             {
@@ -383,7 +383,7 @@ namespace OperationSystem
             return true;
         }
 
-        static int IsNumber(string line)
+        public static int IsNumber(string line)
         {
             string[] hexNumberSymbols = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f" };
             bool isNormalNum = true;
@@ -399,10 +399,6 @@ namespace OperationSystem
                 line = line.Remove(line.Length - 1);
                 num = Convert.ToInt32(line, 16);
             }
-            /*else if (line.All(s => s == '1' || s == '0'))
-            {
-                num = Convert.ToInt32(line, 2);
-            }*/
             else if (line.All(s => Char.IsNumber(s)))
             {
                 num = Convert.ToInt32(line);

@@ -13,6 +13,7 @@ namespace OperationSystem
         static List<List<string>> codeElements = LexicalAnalysis.codeElements;
         static List<ObjectCode> objectCodes = new List<ObjectCode>();
 
+        static Dictionary<string, string> variables = new Dictionary<string, string>();
         public static Dictionary<string, string> dataRegisters8bit = new Dictionary<string, string>
         {
             ["AL"] = "000",
@@ -48,16 +49,13 @@ namespace OperationSystem
             while (strAddress.Length < 4) {
                 strAddress = "0" + strAddress;
             }
-
             return strAddress;
         }
 
         public static void GenerateObjectCode()
         {
-            /*for (int i = 0; i < codeElements.Count; i++) {
-                objectCodes.Add(new ObjectCode(i + 1, i * 2, (i + i).ToString(), Math.Pow(i, 2).ToString()));
-            }*/
             objectCodes.Clear();
+            variables.Clear();
             currentAddress = 0;
 
             for (int i = 0; i < assemblerCode.Count; i++)
@@ -72,28 +70,22 @@ namespace OperationSystem
                 }
                 else if (codeElements[i][0].ToLower() == "sub")
                 {
-                    //currentAddress += GenerateObjectCodeForSubCommand(i);
-                    currentAddress += Gen(i);
+                    currentAddress += GenerateObjectCodeForSubCommand(i);
                 }
                 else if (codeElements[i][0].ToLower() == "add")
                 {
-                    //currentAddress += GenerateObjectCodeForAddCommand(i);
-                    currentAddress += Gen(i);
+                    currentAddress += GenerateObjectCodeForAddCommand(i);
                 } else
                 {
                     currentAddress += Gen(i);
                 }
             }
-
-            //objectCodes.RemoveAll(sentence => sentence.str == "49");
             objectCodes.RemoveAll(sentence => int.TryParse(sentence.str, out num));
         }
 
         static int Gen(int i)
         {
             objectCodes.Add(new ObjectCode(i + 1, currentAddress, (i + i).ToString(), Math.Pow(i, 2).ToString()));
-
-
             return 0;
         }
 
@@ -107,6 +99,7 @@ namespace OperationSystem
             if (codeElements[i][1].ToLower() == "db")
             {
                 objectCodes.Add(new ObjectCode(i + 1, currentAddress, number, assemblerCode[i]));
+                variables.Add(codeElements[i][0], currentAddress.ToString());
                 return 1;
             }
             else if (codeElements[i][1].ToLower() == "dw")
@@ -115,16 +108,15 @@ namespace OperationSystem
                     number = "0" + number;
                 }
                 objectCodes.Add(new ObjectCode(i + 1, currentAddress, number, assemblerCode[i]));
+                variables.Add(codeElements[i][0], currentAddress.ToString());
                 return 2;
             }
-
             return 0;
         }
 
         static int GenerateObjectCodeForPopCommand(int i)
         {
             string sg, reg, mod, rm, objectCode_part1, objectCode_part2, objectCode_part3;
-            int memory = 0;
 
             foreach (var register in segmentRegisters)
             {
@@ -155,7 +147,7 @@ namespace OperationSystem
                     objectCode_part1 = FromBinaryToHex("10001111");
                     objectCode_part2 = FromBinaryToHex("00000110");
                     objectCode_part3 = CreateCorrectAddress(objectCodes[j].address);
-                    objectCodes.Add(new ObjectCode(i + 1, currentAddress, objectCode_part1 +  " " + objectCode_part2 + " " + objectCode_part3, assemblerCode[i]));
+                    objectCodes.Add(new ObjectCode(i + 1, currentAddress, objectCode_part1 + " " + objectCode_part2 + " " + objectCode_part3, assemblerCode[i]));
                     return 4;
                 }
             }
@@ -164,16 +156,208 @@ namespace OperationSystem
 
         static int GenerateObjectCodeForSubCommand(int i)
         {
-            
+            string sg, reg = "", mod, rm = "", w = "0", objectCode_part1, objectCode_part2, objectCode_part3 = "";
+            bool secondOperandIsVariable = false, firstOperandIsReg = false, secondOperandIsReg = false, firstOperandIsVariable = false, 
+                firstOperandIsAccumulator = false, secondOperandIsValue = false;
 
-            return 2;
+            foreach (var register in dataRegisters16bit)
+            {
+                if ("ax" == codeElements[i][1].ToLower())
+                {
+                    firstOperandIsAccumulator = true;
+                    firstOperandIsReg = true;
+                    reg = register.Value;
+                    w = "1";
+                }
+                else if (register.Key == codeElements[i][1] && !firstOperandIsAccumulator)
+                {
+                    firstOperandIsReg = true;
+                    reg = register.Value;
+                }
+
+                if (register.Key == codeElements[i][3])
+                {
+                    secondOperandIsReg = true;
+                    rm = register.Value;
+                    w = "1";
+                }
+            }
+
+            foreach (var register in dataRegisters8bit)
+            {
+                if ("AL" == codeElements[i][1])
+                {
+                    firstOperandIsAccumulator = true;
+                    firstOperandIsReg = true;
+                    reg = register.Value;
+                    w = "0";
+                    break;
+                }
+            }
+
+            foreach (var register in dataRegisters8bit)
+            {
+                if (register.Key == codeElements[i][3])
+                {
+                    secondOperandIsReg = true;
+                    w = "0";
+                    rm = register.Value;
+                }
+            }
+
+            if (!firstOperandIsAccumulator)
+            {
+                foreach (var register in dataRegisters8bit)
+                {
+                    if (register.Key == codeElements[i][1])
+                    {
+                        firstOperandIsReg = true;
+                        reg = register.Value;
+                    }
+                }
+            }
+
+            foreach (var variable in variables)
+            {
+                if (LexicalAnalysis.IsVariable(codeElements[i][3]))
+                {
+                    if (codeElements[i][3].ToUpper() == variable.Key.ToUpper())
+                    {
+                        objectCode_part3 = CreateCorrectAddress(Int32.Parse(variable.Value));
+                        secondOperandIsVariable = true;
+                        break;
+                    }
+                }
+            }
+
+            switch (LexicalAnalysis.IsNumber(codeElements[i][3]))
+            {
+                case 1:
+                    w = "0";
+                    secondOperandIsValue = true;
+                    break;
+                case 2:
+                    w = "1";
+                    secondOperandIsValue = true;
+                    break;
+                case 0:
+                    secondOperandIsValue = false;
+                    break;
+            }
+
+            if (firstOperandIsAccumulator && secondOperandIsValue)
+            {
+                objectCode_part1 = FromBinaryToHex("10110" + w);
+                objectCodes.Add(new ObjectCode(i + 1, currentAddress, objectCode_part1 + " " + codeElements[i][3], assemblerCode[i]));
+                return 3;
+            }
+            else if (firstOperandIsReg && secondOperandIsReg)
+            {
+                objectCode_part1 = FromBinaryToHex("1010" + "1" + w);
+                objectCode_part2 = FromBinaryToHex("11" + reg + rm);
+                objectCodes.Add(new ObjectCode(i + 1, currentAddress, objectCode_part1 + " " + objectCode_part2, assemblerCode[i]));
+                return 2;
+            }
+            else if (firstOperandIsReg && secondOperandIsVariable)
+            {
+                objectCode_part1 = FromBinaryToHex("1010" + "1" + w);
+                objectCode_part2 = FromBinaryToHex("00" + reg + "110");
+                objectCodes.Add(new ObjectCode(i + 1, currentAddress, objectCode_part1 + " " + objectCode_part2 + " " + objectCode_part3, assemblerCode[i]));
+                return 4;
+            }
+
+            return 0;
         }
 
         static int GenerateObjectCodeForAddCommand(int i)
         {
-            
+            string sg, reg = "", mod, rm = "", w = "0", objectCode_part1, objectCode_part2, objectCode_part3 = "";
+            bool secondOperandIsVariable = false, firstOperandIsReg = false, secondOperandIsReg = false, firstOperandIsVariable = false, firstOperandIsAccumulator = false, secondOperandIsValue = false;
 
-            return 3;
+            foreach (var register in dataRegisters16bit)
+            {
+                if ("ax" == codeElements[i][1].ToLower())
+                {
+                    firstOperandIsAccumulator = true;
+                    firstOperandIsReg = true;
+                    w = "1";
+                }
+                else if (register.Key == codeElements[i][1])
+                {
+                    firstOperandIsReg = true;
+                    reg = register.Value;
+                }
+
+                if (register.Key == codeElements[i][3])
+                {
+                    secondOperandIsReg = true;
+                    rm = register.Value;
+                    w = "1";
+                }
+            }
+
+            foreach (var register in dataRegisters8bit)
+            {
+                if ("al" == codeElements[i][1].ToLower() || "ah" == codeElements[i][1].ToLower())
+                {
+                    firstOperandIsAccumulator = true;
+                    firstOperandIsReg = true;
+                    w = "0";
+                }
+                else if (register.Key == codeElements[i][1])
+                {
+                    firstOperandIsReg = true;
+                    reg = register.Value;
+                }
+
+                if (register.Key == codeElements[i][3])
+                {
+                    secondOperandIsReg = true;
+                    w = "0";
+                    rm = register.Value;
+                }
+            }
+
+            foreach (var variable in variables)
+            {
+                if (LexicalAnalysis.IsVariable(codeElements[i][3]))
+                {
+                    if (codeElements[i][3].ToUpper() == variable.Key.ToUpper())
+                    {
+                        objectCode_part3 = CreateCorrectAddress(Int32.Parse(variable.Value));
+                        secondOperandIsVariable = true;
+                        break;
+                    }
+                }
+            }
+
+            if (LexicalAnalysis.IsNumber(codeElements[i][3]) != 0)
+            {
+                secondOperandIsValue = true;
+            }
+            
+            if (firstOperandIsAccumulator && secondOperandIsValue)
+            {
+                objectCode_part1 = FromBinaryToHex("10" + w);
+                objectCodes.Add(new ObjectCode(i + 1, currentAddress, objectCode_part1 + " " + codeElements[i][3], assemblerCode[i]));
+                return 2;
+            }
+            else if (firstOperandIsReg && secondOperandIsReg)
+            {
+                objectCode_part1 = FromBinaryToHex("1" + w);
+                objectCode_part2 = FromBinaryToHex("11" + reg + rm);
+                objectCodes.Add(new ObjectCode(i + 1, currentAddress, objectCode_part1 + " " + objectCode_part2, assemblerCode[i]));
+                return 2;
+            } 
+            else if (firstOperandIsReg && secondOperandIsVariable)
+            {
+                objectCode_part1 = FromBinaryToHex("1" + w);
+                objectCode_part2 = FromBinaryToHex("00" + reg + "110");
+                objectCodes.Add(new ObjectCode(i + 1, currentAddress, objectCode_part1 + " " + objectCode_part2 + " " + objectCode_part3, assemblerCode[i]));
+                return 3;
+            }
+
+            return 0;
         }
 
         static string FromBinaryToHex(string Number)
